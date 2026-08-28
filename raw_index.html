@@ -1,0 +1,1724 @@
+```html
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>醒香微醺 SoberBloom | 無酒精奢華微醺體驗</title>
+  <style>
+    :root {
+      --color-primary: #D4AF37;
+      --color-primary-hover: #B89628;
+      --color-secondary: #71717A;
+      --color-bg: #09090B;
+      --color-surface: #18181B;
+      --color-surface-border: #27272A;
+      --color-text-main: #F4F4F5;
+      --color-text-muted: #A1A1AA;
+      --color-accent: #E5C158;
+      --radius-badge: 4px;
+      --radius-card: 8px;
+      --radius-button: 8px;
+      --radius-input: 6px;
+      --shadow-card: 0 8px 30px rgba(0,0,0,0.7), 0 0 1px 1px rgba(212,175,55,0.2);
+      --shadow-modal: 0 25px 60px rgba(0,0,0,0.8);
+      --shadow-glow: 0 0 20px rgba(212,175,55,0.2);
+      --font-family: 'Georgia', 'Palatino Linotype', 'Noto Serif TC', serif, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--color-bg);
+      color: var(--color-text-main);
+      font-family: var(--font-family);
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #bg-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* Header & Navigation */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--color-surface-border);
+      transition: all 0.3s ease;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .brand-logo svg {
+      width: 32px;
+      height: 32px;
+      fill: var(--color-primary);
+    }
+
+    .brand-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      color: var(--color-primary);
+      text-transform: uppercase;
+    }
+
+    .brand-subtitle {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      letter-spacing: 0.2em;
+      display: block;
+      margin-top: -2px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-link {
+      color: var(--color-text-muted);
+      text-decoration: none;
+      font-size: 0.95rem;
+      letter-spacing: 0.05em;
+      transition: color 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      padding: 4px 0;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: var(--color-primary);
+    }
+
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--color-primary);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .cart-btn {
+      position: relative;
+      background: transparent;
+      border: 1px solid var(--color-primary);
+      color: var(--color-primary);
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-button);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .cart-btn:hover {
+      background: var(--color-primary);
+      color: var(--color-bg);
+      transform: translateY(-2px);
+    }
+
+    .cart-badge {
+      background: #EF4444;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 999px;
+      position: absolute;
+      top: -8px;
+      right: -8px;
+    }
+
+    .mobile-menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--color-text-main);
+      cursor: pointer;
+    }
+
+    /* Main Layout */
+    main {
+      flex: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    .page-section {
+      display: none;
+      animation: fadeIn 0.4s ease-in-out forwards;
+    }
+
+    .page-section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Component Styles */
+    .btn-primary {
+      background-color: var(--color-primary);
+      color: #000;
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius-button);
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background-color: var(--color-primary-hover);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--color-primary);
+      border: 1px solid var(--color-primary);
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius-button);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-outline:hover:not(:disabled) {
+      background: rgba(212, 175, 55, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .section-title {
+      font-size: 2rem;
+      letter-spacing: 0.15em;
+      color: var(--color-primary);
+      margin-bottom: 0.5rem;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .section-subtitle {
+      text-align: center;
+      color: var(--color-text-muted);
+      margin-bottom: 2.5rem;
+      font-size: 1rem;
+    }
+
+    .card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-surface-border);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card:hover {
+      border-color: rgba(212, 175, 55, 0.4);
+      transform: translateY(-4px);
+    }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 4rem 1rem;
+      background: radial-gradient(circle at center, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
+      border-radius: 16px;
+      margin-bottom: 3rem;
+      border: 1px solid rgba(212, 175, 55, 0.15);
+    }
+
+    .hero-title {
+      font-size: 3rem;
+      color: var(--color-accent);
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.1em;
+      line-height: 1.2;
+    }
+
+    .hero-desc {
+      max-width: 800px;
+      margin: 0 auto 2.5rem auto;
+      color: var(--color-text-main);
+      font-size: 1.1rem;
+      line-height: 1.8;
+    }
+
+    /* Product Grid */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .product-card {
+      height: 100%;
+    }
+
+    .product-img-wrap {
+      position: relative;
+      width: 100%;
+      padding-top: 100%; /* 1:1 Aspect */
+      background: #000;
+      overflow: hidden;
+    }
+
+    .product-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .product-card:hover .product-img {
+      transform: scale(1.05);
+    }
+
+    .product-info {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .product-brand {
+      font-size: 0.75rem;
+      color: var(--color-primary);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .product-title {
+      font-size: 1.1rem;
+      color: var(--color-text-main);
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .product-price {
+      font-size: 1.2rem;
+      color: var(--color-accent);
+      font-weight: 600;
+      margin-top: auto;
+      margin-bottom: 12px;
+    }
+
+    .badge-out-of-stock {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(239, 68, 68, 0.9);
+      color: white;
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: var(--radius-badge);
+      font-weight: bold;
+    }
+
+    /* Filters & Search */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      background: var(--color-surface);
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius-card);
+      border: 1px solid var(--color-surface-border);
+    }
+
+    .search-box {
+      display: flex;
+      gap: 8px;
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .input-control {
+      background: var(--color-bg);
+      border: 1px solid var(--color-surface-border);
+      color: var(--color-text-main);
+      padding: 0.6rem 1rem;
+      border-radius: var(--radius-input);
+      font-family: inherit;
+      width: 100%;
+    }
+
+    .input-control:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+
+    .category-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pill-btn {
+      background: transparent;
+      border: 1px solid var(--color-surface-border);
+      color: var(--color-text-muted);
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .pill-btn:hover, .pill-btn.active {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      background: rgba(212, 175, 55, 0.1);
+    }
+
+    /* Detail View */
+    .product-detail-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      background: var(--color-surface);
+      padding: 2.5rem;
+      border-radius: var(--radius-card);
+      border: 1px solid var(--color-surface-border);
+    }
+
+    .detail-gallery {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .main-detail-img {
+      width: 100%;
+      border-radius: var(--radius-card);
+      aspect-ratio: 1;
+      object-fit: cover;
+      border: 1px solid var(--color-surface-border);
+    }
+
+    .qty-picker {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 1.5rem 0;
+    }
+
+    .qty-btn {
+      width: 36px;
+      height: 36px;
+      background: var(--color-bg);
+      border: 1px solid var(--color-surface-border);
+      color: var(--color-text-main);
+      border-radius: var(--radius-input);
+      cursor: pointer;
+      font-size: 1.1rem;
+    }
+
+    /* About Us & Gallery */
+    .story-card {
+      background: var(--color-surface);
+      border-radius: var(--radius-card);
+      border: 1px solid var(--color-surface-border);
+      padding: 2.5rem;
+      margin-bottom: 3rem;
+      line-height: 2;
+      color: var(--color-text-main);
+      font-size: 1.05rem;
+      white-space: pre-line;
+    }
+
+    /* Dynamic Photo Gallery */
+    .photo-gallery {
+      display: grid;
+      gap: 1rem;
+      width: 100%;
+    }
+
+    .gallery-1 { grid-template-columns: 1fr; }
+    .gallery-2 { grid-template-columns: repeat(2, 1fr); }
+    
+    .gallery-3 {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      gap: 1rem;
+    }
+    .gallery-3-right {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .gallery-hybrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      grid-auto-flow: dense;
+      gap: 1rem;
+    }
+
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-card);
+      cursor: pointer;
+      background: #000;
+      aspect-ratio: 4/3;
+      border: 1px solid var(--color-surface-border);
+    }
+
+    .gallery-item.landscape { grid-column: span 2; }
+    .gallery-item.portrait { grid-row: span 2; aspect-ratio: 3/4; }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.03);
+    }
+
+    /* Contact Page */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    .contact-info-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: var(--color-surface);
+      padding: 1.25rem;
+      border-radius: var(--radius-card);
+      border: 1px solid var(--color-surface-border);
+      text-decoration: none;
+      color: var(--color-text-main);
+      transition: all 0.3s ease;
+    }
+
+    .contact-item:hover {
+      border-color: var(--color-primary);
+      transform: translateX(4px);
+    }
+
+    .contact-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(212, 175, 55, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-primary);
+      flex-shrink: 0;
+    }
+
+    /* Modals & Cart Drawer */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--color-surface);
+      border: 1px solid var(--color-surface-border);
+      border-radius: var(--radius-card);
+      width: 90%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 2rem;
+      box-shadow: var(--shadow-modal);
+      position: relative;
+    }
+
+    .cart-drawer {
+      position: fixed;
+      top: 0;
+      right: -420px;
+      width: 100%;
+      max-width: 400px;
+      height: 100vh;
+      background: var(--color-surface);
+      border-left: 1px solid var(--color-surface-border);
+      z-index: 300;
+      transition: right 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem;
+      box-shadow: var(--shadow-modal);
+    }
+
+    .cart-drawer.active {
+      right: 0;
+    }
+
+    .cart-item {
+      display: flex;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--color-surface-border);
+      align-items: center;
+    }
+
+    .cart-item-img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: var(--radius-badge);
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--color-surface-border);
+      background: rgba(9, 9, 11, 0.9);
+      padding: 2rem 1.5rem;
+      text-align: center;
+      margin-top: auto;
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+    }
+
+    footer a {
+      color: var(--color-primary);
+      text-decoration: none;
+    }
+
+    /* Lightbox */
+    .lightbox {
+      position: fixed;
+      top:0; left:0; width:100vw; height:100vh;
+      background: rgba(0,0,0,0.95);
+      z-index: 500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .lightbox.active { display: flex; }
+    .lightbox img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: var(--radius-card); }
+
+    /* Alert Banner */
+    .alert-banner {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid #EF4444;
+      color: #F87171;
+      padding: 1rem;
+      border-radius: var(--radius-card);
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    /* RWD */
+    @media (max-width: 768px) {
+      .hero-title { font-size: 2rem; }
+      .product-detail-container, .contact-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+      .nav-links { display: none; }
+      .nav-links.mobile-open {
+        display: flex;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: var(--color-surface);
+        flex-direction: column;
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--color-surface-border);
+      }
+      .mobile-menu-toggle { display: block; }
+      .gallery-3 { grid-template-columns: 1fr; }
+      .gallery-item.landscape { grid-column: span 1; }
+      .gallery-item.portrait { grid-row: span 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Canvas Fullscreen Dynamic Background -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- Navigation -->
+  <header>
+    <div class="nav-container">
+      <div class="brand-logo" onclick="switchTab('home')">
+        <svg viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+        <div>
+          <span class="brand-title">醒香微醺</span>
+          <span class="brand-subtitle">SoberBloom</span>
+        </div>
+      </div>
+      
+      <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+
+      <ul class="nav-links" id="nav-menu">
+        <li><a class="nav-link active" data-tab="home" onclick="switchTab('home')">首頁</a></li>
+        <li><a class="nav-link" data-tab="products" onclick="switchTab('products')">精選商品</a></li>
+        <li><a class="nav-link" data-tab="about" onclick="switchTab('about')">關於我們</a></li>
+        <li><a class="nav-link" data-tab="contact" onclick="switchTab('contact')">聯絡我們</a></li>
+        <li>
+          <button class="cart-btn" onclick="toggleCartDrawer()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            <span>購物車</span>
+            <span class="cart-badge" id="cart-count">0</span>
+          </button>
+        </li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Main View Router Container -->
+  <main>
+    <!-- System Warning Alert Container -->
+    <div id="error-banner" style="display: none;" class="alert-banner"></div>
+
+    <!-- HOME PAGE -->
+    <section id="view-home" class="page-section active">
+      <div class="hero">
+        <h1 class="hero-title">醒香微醺 SoberBloom</h1>
+        <p class="hero-desc">告別宿醉與卡路里，嚴選天然草本植物與水果精華，打造零酒精、高質感的精釀基底與調香組合。搭配質感杯具與專屬食譜，只需五分鐘，即可在家輕鬆調出酒吧級微醺儀式感。清醒，也能盡情享受生活的曼妙層次。</p>
+        <button class="btn-primary" onclick="switchTab('products')">探索最新系列</button>
+      </div>
+
+      <h2 class="section-title">最新精選商品</h2>
+      <p class="section-subtitle">探索專為奢華品味人士打造的天然調香酒基</p>
+      <div class="products-grid" id="home-products-grid">
+        <!-- Dynamic Product Cards -->
+      </div>
+    </section>
+
+    <!-- PRODUCTS LIST PAGE -->
+    <section id="view-products" class="page-section">
+      <h2 class="section-title">精選商品系列</h2>
+      <p class="section-subtitle">品味零酒精草本工藝的靈魂之作</p>
+
+      <div class="filter-bar">
+        <div class="search-box">
+          <input type="text" id="search-input" class="input-control" placeholder="搜尋商品名稱或成分..." onkeyup="handleSearchKey(event)">
+          <button class="btn-primary" onclick="executeSearch()">搜尋</button>
+        </div>
+        <div class="category-pills" id="category-pills">
+          <button class="pill-btn active" onclick="filterCategory('')">全部商品</button>
+        </div>
+      </div>
+
+      <div class="products-grid" id="all-products-grid"></div>
+    </section>
+
+    <!-- PRODUCT DETAIL PAGE -->
+    <section id="view-product-detail" class="page-section">
+      <button class="btn-outline" onclick="switchTab('products')" style="margin-bottom: 1.5rem;">← 返回商品列表</button>
+      <div class="product-detail-container" id="product-detail-content">
+        <!-- Dynamic Content -->
+      </div>
+    </section>
+
+    <!-- ABOUT US PAGE -->
+    <section id="view-about" class="page-section">
+      <h2 class="section-title">關於 醒香微醺</h2>
+      <p class="section-subtitle">SoberBloom Brand Story</p>
+
+      <div class="story-card">
+        「醒香微醺」誕生於一個深夜的靈感——我們熱愛酒吧那份放鬆與浪漫，卻漸漸無法忍受隔天的沉重與不適。難道享受夜晚與維持清醒只能二選一？
+
+        我們決定重新定義「微醺」。走訪植物萃取工坊，尋找天然香草、花果與草本精華，精心研發無酒精調酒組。我們相信，生活需要儀式感，而儀式感的靈魂在於「當下的專注與美感」，而非酒精。醒香微醺為你保留清爽的口感與優雅的氛圍，讓每一個值得慶祝的時刻，都能清醒地沉醉。
+      </div>
+
+      <h3 style="color: var(--color-primary); margin-bottom: 1.5rem; text-align: center; font-size: 1.5rem;">品牌空間與工坊</h3>
+      <div id="photo-gallery" class="photo-gallery"></div>
+    </section>
+
+    <!-- CONTACT US PAGE -->
+    <section id="view-contact" class="page-section">
+      <h2 class="section-title">聯絡我們</h2>
+      <p class="section-subtitle">如有客製化需求或體驗諮詢，歡迎與我們專人聯繫</p>
+
+      <div class="contact-grid">
+        <div class="contact-info-list" id="contact-info-list">
+          <!-- Dynamic Contact Items -->
+        </div>
+
+        <div class="card" style="padding: 2rem;">
+          <h3 style="color: var(--color-primary); margin-bottom: 1rem;">線上表單留言</h3>
+          <form id="contact-form" onsubmit="handleContactSubmit(event)">
+            <div style="margin-bottom: 1rem;">
+              <label style="display:block; margin-bottom:0.5rem; font-size:0.9rem;">姓名 *</label>
+              <input type="text" id="contact-name" class="input-control" required placeholder="您的貴姓大名">
+            </div>
+            <div style="margin-bottom: 1rem;">
+              <label style="display:block; margin-bottom:0.5rem; font-size:0.9rem;">Email *</label>
+              <input type="email" id="contact-email" class="input-control" required placeholder="example@domain.com">
+            </div>
+            <div style="margin-bottom: 1rem;">
+              <label style="display:block; margin-bottom:0.5rem; font-size:0.9rem;">電話 (選填)</label>
+              <input type="tel" id="contact-phone" class="input-control" placeholder="0912345678">
+            </div>
+            <div style="margin-bottom: 1.5rem;">
+              <label style="display:block; margin-bottom:0.5rem; font-size:0.9rem;">需求描述 (最多500字)</label>
+              <textarea id="contact-desc" class="input-control" rows="4" maxlength="500" placeholder="請填寫您想諮詢的內容..."></textarea>
+            </div>
+            <button type="submit" id="contact-submit-btn" class="btn-primary" style="width: 100%;">送出訊息</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Cart Drawer -->
+  <div class="cart-drawer" id="cart-drawer">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <h3 style="color: var(--color-primary);">您的購物車</h3>
+      <button onclick="toggleCartDrawer()" style="background: none; border: none; color: white; cursor: pointer; font-size: 1.5rem;">&times;</button>
+    </div>
+    
+    <div id="cart-items" style="flex: 1; overflow-y: auto;">
+      <!-- Dynamic Cart Items -->
+    </div>
+
+    <div style="margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--color-surface-border);">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+        <span>商品小計</span>
+        <span id="cart-subtotal">$0</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--color-text-muted);">
+        <span>運費</span>
+        <span id="cart-shipping-fee">$0</span>
+      </div>
+      <p id="free-shipping-hint" style="font-size: 0.8rem; color: var(--color-accent); margin-bottom: 1rem; text-align: right;"></p>
+      <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.2rem; color: var(--color-primary); margin-bottom: 1rem;">
+        <span>總計金額</span>
+        <span id="cart-total">$0</span>
+      </div>
+      <button class="btn-primary" id="checkout-drawer-btn" style="width: 100%;" onclick="openCheckoutModal()">前往結帳</button>
+    </div>
+  </div>
+
+  <!-- Checkout Modal -->
+  <div class="modal-overlay" id="checkout-modal">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h3 style="color: var(--color-primary);">結帳與配送資訊</h3>
+        <button onclick="closeCheckoutModal()" style="background: none; border: none; color: white; cursor: pointer; font-size: 1.5rem;">&times;</button>
+      </div>
+
+      <form id="checkout-form" onsubmit="handleCheckoutSubmit(event)">
+        <div style="margin-bottom: 1rem;">
+          <label style="display:block; margin-bottom:0.5rem; font-size:0.9rem;">訂購人姓名 *</label>
+          <input type="text" id="cust-name" class="input-control" required placeholder="張先生/小姐">
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <label style="display:block; margin-bottom:0.5rem; font-size:0.9rem;">聯絡電話 *</label>
+          <input type="tel" id="cust-phone" class="input-control" required placeholder="0912345678">
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <label style="display:block; margin-bottom:0.5rem; font-size:0.9rem;">配送地址 *</label>
+          <input type="text" id="cust-address" class="input-control" required placeholder="請填寫完整送貨地址">
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <label style="display:block; margin-bottom:0.5rem; font-size:0.9rem;">Email (選填，發送訂單通知)</label>
+          <input type="email" id="cust-email" class="input-control" placeholder="example@email.com">
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display:block; margin-bottom:0.5rem; font-size:0.9rem;">付款方式 *</label>
+          <div id="payment-options" style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <!-- Dynamic Payment Radios -->
+          </div>
+        </div>
+
+        <button type="submit" id="pay-submit-btn" class="btn-primary" style="width: 100%;">確認下單並支付</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Bank Info Modal -->
+  <div class="modal-overlay" id="bank-info-modal">
+    <div class="modal-content" style="text-align: center;">
+      <h3 style="color: var(--color-primary); margin-bottom: 1rem;">訂單已建立 (銀行轉帳)</h3>
+      <p style="margin-bottom: 1.5rem;">感謝您的訂購，請依照以下資訊進行匯款：</p>
+      <div style="background: var(--color-bg); padding: 1.5rem; border-radius: var(--radius-card); text-align: left; margin-bottom: 1.5rem; border: 1px solid var(--color-surface-border);">
+        <p style="margin-bottom: 0.5rem;"><strong>銀行名稱：</strong> <span id="bank-name-display"></span></p>
+        <p style="margin-bottom: 0.5rem;"><strong>戶名：</strong> <span id="bank-acc-name-display"></span></p>
+        <p><strong>轉帳帳號：</strong> <span id="bank-acc-num-display" style="color: var(--color-primary); font-weight: bold; font-size: 1.1rem;"></span></p>
+      </div>
+      <button class="btn-primary" onclick="finishBankOrder()">理解並完成</button>
+    </div>
+  </div>
+
+  <!-- Lightbox Modal -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <img id="lightbox-img" src="" alt="Enlarged Image">
+  </div>
+
+  <!-- Hidden Form for Newebpay POST -->
+  <form id="newebpay-form" method="POST" action="" style="display:none;">
+    <input type="hidden" name="MerchantID" id="nb-MerchantID">
+    <input type="hidden" name="TradeInfo" id="nb-TradeInfo">
+    <input type="hidden" name="TradeSha" id="nb-TradeSha">
+    <input type="hidden" name="Version" id="nb-Version">
+  </form>
+
+  <!-- Footer -->
+  <footer>
+    <p style="margin-bottom: 0.5rem;">© 2026 醒香微醺 SoberBloom. All rights reserved.</p>
+    <p>Powered by <a href="https://chandone.pages.dev" target="_blank" rel="noopener">ChanDone</a></p>
+  </footer>
+
+  <script>
+    /* Global Application State & Configurations */
+    const API_BASE = "https://grocery-496707.de.r.appspot.com";
+    const API_KEY = "2fc1cf4b-a31f-4ebb-803b-f6f082d13240";
+
+    let shopInfo = null;
+    let categoriesList = [];
+    let cart = JSON.parse(localStorage.getItem('soberbloom_cart') || '[]');
+    let currentDetailProduct = null;
+
+    /* Helper: API Fetcher */
+    async function apiRequest(endpoint, options = {}) {
+      const headers = {
+        'X-API-Key': API_KEY,
+        ...(options.headers || {})
+      };
+      if (options.body && !(options.body instanceof FormData)) {
+        headers['Content-Type'] = 'application/json';
+      }
+      try {
+        const response = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
+        if (!response.ok) throw new Error(`API Error: ${response.status}`);
+        return await response.json();
+      } catch (err) {
+        console.error(`Request Failed [${endpoint}]:`, err);
+        throw err;
+      }
+    }
+
+    /* Initialize Application */
+    document.addEventListener('DOMContentLoaded', () => {
+      initCanvasBackground();
+      updateCartBadge();
+      loadShopInfo();
+      loadHomeProducts();
+      
+      // Close lightbox on Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeLightbox();
+      });
+    });
+
+    /* Tab Switcher */
+    function switchTab(tabId) {
+      document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+
+      const targetView = document.getElementById(`view-${tabId}`);
+      if (targetView) targetView.classList.add('active');
+
+      const activeNav = document.querySelector(`.nav-link[data-tab="${tabId}"]`);
+      if (activeNav) activeNav.classList.add('active');
+
+      // Hide mobile menu on selection
+      document.getElementById('nav-menu').classList.remove('mobile-open');
+
+      // Lazy load tab data
+      if (tabId === 'products') {
+        loadCategories();
+        loadAllProducts();
+      } else if (tabId === 'about') {
+        renderGallery();
+      } else if (tabId === 'contact') {
+        loadContactInfo();
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function toggleMobileMenu() {
+      document.getElementById('nav-menu').classList.toggle('mobile-open');
+    }
+
+    /* System Error Display */
+    function showErrorBanner(msg) {
+      const banner = document.getElementById('error-banner');
+      banner.textContent = msg;
+      banner.style.display = 'block';
+    }
+
+    /* Fetch Shop Info & Settings */
+    async function loadShopInfo() {
+      try {
+        shopInfo = await apiRequest('/api/shop-info');
+        updateCartState();
+      } catch (err) {
+        showErrorBanner("購物流程出現錯誤，請重新整理網頁再次嘗試。");
+      }
+    }
+
+    /* HOME TAB: Fetch Products */
+    async function loadHomeProducts() {
+      try {
+        const products = await apiRequest('/api/products');
+        const grid = document.getElementById('home-products-grid');
+        grid.innerHTML = '';
+        
+        const top10 = products.slice(0, 10);
+        top10.forEach(prod => {
+          grid.appendChild(createProductCard(prod));
+        });
+      } catch (err) {
+        showErrorBanner("網頁顯示異常，請重新整理頁面警語。");
+      }
+    }
+
+    /* PRODUCTS TAB: Categories & Search */
+    async function loadCategories() {
+      if (categoriesList.length > 0) return;
+      try {
+        categoriesList = await apiRequest('/api/categories');
+        const container = document.getElementById('category-pills');
+        container.innerHTML = `<button class="pill-btn active" onclick="filterCategory('')">全部商品</button>`;
+        categoriesList.forEach(cat => {
+          const btn = document.createElement('button');
+          btn.className = 'pill-btn';
+          btn.textContent = cat.name;
+          btn.onclick = () => filterCategory(cat.id, btn);
+          container.appendChild(btn);
+        });
+      } catch (err) {
+        console.error("Failed to load categories", err);
+      }
+    }
+
+    async function loadAllProducts(query = '', categoryId = '') {
+      try {
+        let endpoint = '/api/products';
+        if (query) {
+          endpoint += `?q=${encodeURIComponent(query)}`;
+        }
+        const products = await apiRequest(endpoint);
+        const grid = document.getElementById('all-products-grid');
+        grid.innerHTML = '';
+
+        let filtered = products;
+        if (categoryId) {
+          filtered = products.filter(p => p.category_id === categoryId);
+        }
+
+        if (filtered.length === 0) {
+          grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--color-text-muted); padding: 3rem 0;">未找到相關商品</p>`;
+          return;
+        }
+
+        filtered.forEach(prod => {
+          grid.appendChild(createProductCard(prod));
+        });
+      } catch (err) {
+        showErrorBanner("無法載入商品，請重新整理頁面。");
+      }
+    }
+
+    function handleSearchKey(e) {
+      if (e.key === 'Enter') executeSearch();
+    }
+
+    function executeSearch() {
+      const q = document.getElementById('search-input').value.trim();
+      loadAllProducts(q);
+    }
+
+    function filterCategory(catId, btnEl) {
+      document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+      else document.querySelector('.pill-btn').classList.add('active');
+      
+      const q = document.getElementById('search-input').value.trim();
+      loadAllProducts(q, catId);
+    }
+
+    /* Construct Product Card UI */
+    function createProductCard(product) {
+      const card = document.createElement('div');
+      card.className = 'card product-card';
+
+      const isOutOfStock = product.is_stock_tracked && (product.stock_quantity === 0 || !product.is_in_stock);
+      const imgUrl = (product.images && product.images.length > 0) ? product.images[0] : 'https://via.placeholder.com/300?text=SoberBloom';
+
+      card.innerHTML = `
+        <div class="product-img-wrap" onclick="viewProductDetail('${product.id}')" style="cursor: pointer;">
+          <img class="product-img" src="${imgUrl}" alt="${product.name}" loading="lazy" decoding="async">
+          ${isOutOfStock ? `<span class="badge-out-of-stock">已售完 / Out of Stock</span>` : ''}
+        </div>
+        <div class="product-info">
+          <div class="product-brand">${product.brand || 'SoberBloom'}</div>
+          <div class="product-title">${product.name}</div>
+          <div class="product-price">NT$ ${product.price}</div>
+          <button class="btn-primary" style="width: 100%; margin-top: 8px;" 
+            ${isOutOfStock || (shopInfo && shopInfo.payment_settings && shopInfo.payment_settings.disable_payment) ? 'disabled' : ''}
+            onclick="addToCart('${product.id}', '${product.name.replace(/'/g, "\\'")}', ${product.price}, '${imgUrl}')">
+            ${isOutOfStock ? '已售完' : '加入購物車'}
+          </button>
+        </div>
+      `;
+      return card;
+    }
+
+    /* PRODUCT DETAIL VIEW */
+    async function viewProductDetail(productId) {
+      try {
+        const prod = await apiRequest(`/api/products/${productId}`);
+        currentDetailProduct = prod;
+
+        const container = document.getElementById('product-detail-content');
+        const isOutOfStock = prod.is_stock_tracked && (prod.stock_quantity === 0 || !prod.is_in_stock);
+        const mainImg = (prod.images && prod.images.length > 0) ? prod.images[0] : 'https://via.placeholder.com/500?text=SoberBloom';
+
+        let stockNotice = '';
+        if (prod.is_stock_tracked) {
+          if (prod.stock_quantity === 0) stockNotice = `<span style="color: #EF4444; font-size:0.9rem; font-weight:bold;">已售完 / Out of Stock</span>`;
+          else if (prod.stock_quantity > 0) stockNotice = `<span style="color: var(--color-accent); font-size:0.9rem;">剩餘 ${prod.stock_quantity} 件</span>`;
+        }
+
+        const maxQty = (prod.is_stock_tracked && prod.stock_quantity > 0) ? prod.stock_quantity : 99;
+
+        container.innerHTML = `
+          <div class="detail-gallery">
+            <img class="main-detail-img" src="${mainImg}" alt="${prod.name}">
+          </div>
+          <div>
+            <div style="color: var(--color-primary); font-size: 0.9rem; letter-spacing: 0.1em; text-transform: uppercase;">${prod.brand || 'SoberBloom'}</div>
+            <h2 style="font-size: 2rem; color: var(--color-text-main); margin: 0.5rem 0;">${prod.name}</h2>
+            <div style="font-size: 1.5rem; color: var(--color-accent); font-weight: bold; margin-bottom: 1rem;">NT$ ${prod.price}</div>
+            
+            <p style="color: var(--color-text-muted); margin-bottom: 1.5rem; white-space: pre-line; line-height: 1.8;">${prod.description || ''}</p>
+
+            ${stockNotice ? `<div style="margin-bottom: 1rem;">${stockNotice}</div>` : ''}
+
+            <div class="qty-picker">
+              <span style="font-size: 0.9rem; color: var(--color-text-muted);">數量：</span>
+              <button class="qty-btn" onclick="adjustDetailQty(-1)">-</button>
+              <input type="number" id="detail-qty-input" value="1" min="1" max="${maxQty}" style="width: 50px; text-align: center;" class="input-control" readonly>
+              <button class="qty-btn" onclick="adjustDetailQty(1, ${maxQty})">+</button>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+              <button class="btn-primary" style="flex: 1;" ${isOutOfStock || (shopInfo && shopInfo.payment_settings && shopInfo.payment_settings.disable_payment) ? 'disabled' : ''} 
+                onclick="addDetailToCart(false)">加入購物車</button>
+              <button class="btn-outline" style="flex: 1;" ${isOutOfStock || (shopInfo && shopInfo.payment_settings && shopInfo.payment_settings.disable_payment) ? 'disabled' : ''} 
+                onclick="addDetailToCart(true)">立即購買</button>
+            </div>
+          </div>
+        `;
+
+        switchTab('product-detail');
+      } catch (err) {
+        alert("無法載入商品詳細資訊");
+      }
+    }
+
+    function adjustDetailQty(delta, max = 99) {
+      const input = document.getElementById('detail-qty-input');
+      let val = parseInt(input.value) + delta;
+      if (val < 1) val = 1;
+      if (val > max) val = max;
+      input.value = val;
+    }
+
+    function addDetailToCart(directBuy = false) {
+      if (!currentDetailProduct) return;
+      const qty = parseInt(document.getElementById('detail-qty-input').value) || 1;
+      const imgUrl = (currentDetailProduct.images && currentDetailProduct.images.length > 0) ? currentDetailProduct.images[0] : '';
+      
+      addToCart(currentDetailProduct.id, currentDetailProduct.name, currentDetailProduct.price, imgUrl, qty);
+      
+      if (directBuy) {
+        toggleCartDrawer(true);
+        openCheckoutModal();
+      } else {
+        toggleCartDrawer(true);
+      }
+    }
+
+    /* CART & CHECKOUT LOGIC */
+    function addToCart(id, name, price, image, qty = 1) {
+      const existing = cart.find(item => item.id === id);
+      if (existing) {
+        existing.qty += qty;
+      } else {
+        cart.push({ id, name, price: parseFloat(price), image, qty });
+      }
+      saveCart();
+      updateCartDrawer();
+    }
+
+    function updateCartQty(id, delta) {
+      const item = cart.find(i => i.id === id);
+      if (item) {
+        item.qty += delta;
+        if (item.qty <= 0) {
+          cart = cart.filter(i => i.id !== id);
+        }
+      }
+      saveCart();
+      updateCartDrawer();
+    }
+
+    function saveCart() {
+      localStorage.setItem('soberbloom_cart', JSON.stringify(cart));
+      updateCartBadge();
+    }
+
+    function updateCartBadge() {
+      const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
+      document.getElementById('cart-count').textContent = totalCount;
+    }
+
+    function toggleCartDrawer(forceOpen = false) {
+      const drawer = document.getElementById('cart-drawer');
+      if (forceOpen) drawer.classList.add('active');
+      else drawer.classList.toggle('active');
+      
+      if (drawer.classList.contains('active')) {
+        updateCartDrawer();
+      }
+    }
+
+    function updateCartState() {
+      if (!shopInfo) return;
+      const disablePayment = shopInfo.payment_settings ? shopInfo.payment_settings.disable_payment : false;
+      const btn = document.getElementById('checkout-drawer-btn');
+      if (disablePayment) {
+        btn.disabled = true;
+        btn.textContent = "暫不開放購物功能";
+      } else {
+        btn.disabled = false;
+        btn.textContent = "前往結帳";
+      }
+    }
+
+    function updateCartDrawer() {
+      const container = document.getElementById('cart-items');
+      container.innerHTML = '';
+
+      if (cart.length === 0) {
+        container.innerHTML = `<p style="text-align: center; color: var(--color-text-muted); padding: 2rem 0;">購物車是空的</p>`;
+        document.getElementById('cart-subtotal').textContent = '$0';
+        document.getElementById('cart-shipping-fee').textContent = '$0';
+        document.getElementById('cart-total').textContent = '$0';
+        document.getElementById('free-shipping-hint').textContent = '';
+        return;
+      }
+
+      let subtotal = 0;
+      cart.forEach(item => {
+        subtotal += item.price * item.qty;
+        const el = document.createElement('div');
+        el.className = 'cart-item';
+        el.innerHTML = `
+          <img src="${item.image}" class="cart-item-img" alt="${item.name}">
+          <div style="flex:1;">
+            <div style="font-size:0.9rem; font-weight:bold;">${item.name}</div>
+            <div style="color: var(--color-accent); font-size:0.85rem;">NT$ ${item.price}</div>
+            <div style="display:flex; align-items:center; gap:6px; margin-top:4px;">
+              <button class="qty-btn" style="width:24px; height:24px; font-size:0.8rem;" onclick="updateCartQty('${item.id}', -1)">-</button>
+              <span style="font-size:0.85rem;">${item.qty}</span>
+              <button class="qty-btn" style="width:24px; height:24px; font-size:0.8rem;" onclick="updateCartQty('${item.id}', 1)">+</button>
+            </div>
+          </div>
+        `;
+        container.appendChild(el);
+      });
+
+      // Shipping & Threshold calculation
+      let shippingFee = 65;
+      let freeThreshold = null;
+
+      if (shopInfo && shopInfo.payment_settings) {
+        shippingFee = shopInfo.payment_settings.shipping_fee ?? 65;
+        freeThreshold = shopInfo.payment_settings.free_shipping_threshold;
+      }
+
+      let actualShipping = shippingFee;
+      const hintEl = document.getElementById('free-shipping-hint');
+
+      if (freeThreshold !== null && freeThreshold !== undefined) {
+        if (subtotal > freeThreshold) {
+          actualShipping = 0;
+          hintEl.textContent = "已符合滿額免運條件！";
+        } else {
+          const diff = freeThreshold - subtotal;
+          hintEl.textContent = `再消費 NT$ ${diff} 即可享免運優惠`;
+        }
+      } else {
+        hintEl.textContent = '';
+      }
+
+      const total = subtotal + actualShipping;
+
+      document.getElementById('cart-subtotal').textContent = `NT$ ${subtotal}`;
+      document.getElementById('cart-shipping-fee').textContent = actualShipping === 0 ? '免運費' : `NT$ ${actualShipping}`;
+      document.getElementById('cart-total').textContent = `NT$ ${total}`;
+    }
+
+    function openCheckoutModal() {
+      if (cart.length === 0) return alert("購物車沒有商品");
+      if (!shopInfo) return showErrorBanner("購物流程出現錯誤，請重新整理網頁再次嘗試");
+
+      // Populate Payment Options
+      const container = document.getElementById('payment-options');
+      container.innerHTML = '';
+
+      const settings = shopInfo.payment_settings || {};
+      let hasOption = false;
+
+      if (settings.is_credit_card_enabled) {
+        hasOption = true;
+        container.innerHTML += `
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+            <input type="radio" name="payment_method" value="credit_card" checked> 信用卡付款
+          </label>
+        `;
+      }
+      if (settings.is_bank_transfer_enabled) {
+        hasOption = true;
+        container.innerHTML += `
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+            <input type="radio" name="payment_method" value="bank_transfer" ${!settings.is_credit_card_enabled ? 'checked' : ''}> 銀行轉帳
+          </label>
+        `;
+      }
+
+      if (!hasOption) {
+        container.innerHTML = `<span style="color:#EF4444; font-size:0.9rem;">目前暫無可用的付款方式</span>`;
+      }
+
+      toggleCartDrawer(false);
+      document.getElementById('checkout-modal').classList.add('active');
+    }
+
+    function closeCheckoutModal() {
+      document.getElementById('checkout-modal').classList.remove('active');
+    }
+
+    async function handleCheckoutSubmit(e) {
+      e.preventDefault();
+      const submitBtn = document.getElementById('pay-submit-btn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = '訂單處理中...';
+
+      try {
+        let subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+        let shippingFee = shopInfo.payment_settings?.shipping_fee ?? 65;
+        const freeThreshold = shopInfo.payment_settings?.free_shipping_threshold;
+
+        if (freeThreshold !== null && freeThreshold !== undefined && subtotal > freeThreshold) {
+          shippingFee = 0;
+        }
+
+        const totalAmount = subtotal + shippingFee;
+        const method = document.querySelector('input[name="payment_method"]:checked')?.value || 'credit_card';
+
+        // Prepare items list + shipping
+        const itemsList = cart.map(item => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          qty: item.qty
+        }));
+
+        if (shippingFee > 0) {
+          itemsList.push({
+            id: 'shipping_fee',
+            name: '運費',
+            price: shippingFee,
+            qty: 1
+          });
+        }
+
+        const itemDesc = cart.map(i => `${i.name} x ${i.qty}`).join(', ');
+
+        const payload = {
+          amount: totalAmount,
+          item_desc: itemDesc,
+          payment_method: method,
+          items: itemsList,
+          customer_data: {
+            name: document.getElementById('cust-name').value,
+            phone: document.getElementById('cust-phone').value,
+            address: document.getElementById('cust-address').value,
+            email: document.getElementById('cust-email').value
+          }
+        };
+
+        const res = await apiRequest('/api/create-payment', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+
+        if (res.status === 'success') {
+          // Clear Cart
+          cart = [];
+          saveCart();
+          closeCheckoutModal();
+
+          if (method === 'credit_card') {
+            // Newebpay Auto POST
+            document.getElementById('newebpay-form').action = res.newebpay_url;
+            document.getElementById('nb-MerchantID').value = res.MerchantID;
+            document.getElementById('nb-TradeInfo').value = res.TradeInfo;
+            document.getElementById('nb-TradeSha').value = res.TradeSha;
+            document.getElementById('nb-Version').value = res.Version;
+            document.getElementById('newebpay-form').submit();
+          } else {
+            // Bank Transfer Dialog
+            const pSettings = shopInfo.payment_settings || {};
+            document.getElementById('bank-name-display').textContent = pSettings.bank_name || '未指定';
+            document.getElementById('bank-acc-name-display').textContent = pSettings.bank_account_name || '未指定';
+            document.getElementById('bank-acc-num-display').textContent = pSettings.bank_account_number || '未指定';
+            document.getElementById('bank-info-modal').classList.add('active');
+          }
+        } else {
+          alert('訂單建立失敗，請重試。');
+        }
+      } catch (err) {
+        showErrorBanner('購物流程出現錯誤，請重新整理網頁再次嘗試');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '確認下單並支付';
+      }
+    }
+
+    function finishBankOrder() {
+      document.getElementById('bank-info-modal').classList.remove('active');
+      switchTab('home');
+    }
+
+    /* ABOUT TAB: DYNAMIC GALLERY */
+    async function renderGallery() {
+      const container = document.getElementById('photo-gallery');
+      if (!shopInfo) await loadShopInfo();
+
+      let photos = [];
+      if (shopInfo.photos && shopInfo.photos.length > 0) {
+        photos = shopInfo.photos;
+      } else if (shopInfo.shop_photo_url) {
+        photos = [shopInfo.shop_photo_url];
+      } else {
+        photos = [
+          'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=800&q=80',
+          'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=800&q=80',
+          'https://images.unsplash.com/photo-1536935338788-846bb9981813?auto=format&fit=crop&w=800&q=80'
+        ];
+      }
+
+      container.className = 'photo-gallery';
+      container.innerHTML = '';
+
+      if (photos.length === 1) {
+        container.classList.add('gallery-1');
+      } else if (photos.length === 2) {
+        container.classList.add('gallery-2');
+      } else if (photos.length === 3) {
+        container.classList.add('gallery-3');
+      } else {
+        container.classList.add('gallery-hybrid');
+      }
+
+      if (photos.length === 3) {
+        const leftWrap = document.createElement('div');
+        leftWrap.className = 'gallery-item';
+        leftWrap.innerHTML = `<img src="${photos[0]}" onclick="openLightbox('${photos[0]}')" loading="lazy">`;
+        
+        const rightWrap = document.createElement('div');
+        rightWrap.className = 'gallery-3-right';
+        rightWrap.innerHTML = `
+          <div class="gallery-item" style="height: 50%;"><img src="${photos[1]}" onclick="openLightbox('${photos[1]}')" loading="lazy"></div>
+          <div class="gallery-item" style="height: 50%;"><img src="${photos[2]}" onclick="openLightbox('${photos[2]}')" loading="lazy"></div>
+        `;
+
+        container.appendChild(leftWrap);
+        container.appendChild(rightWrap);
+      } else {
+        photos.forEach((url) => {
+          const item = document.createElement('div');
+          item.className = 'gallery-item';
+          
+          // Detect Orientation
+          const img = new Image();
+          img.src = url;
+          img.onload = () => {
+            const ratio = img.naturalWidth / img.naturalHeight;
+            if (photos.length >= 4) {
+              if (ratio > 1.15) item.classList.add('landscape');
+              else if (ratio < 0.87) item.classList.add('portrait');
+            }
+          };
+
+          item.innerHTML = `<img src="${url}" onclick="openLightbox('${url}')" loading="lazy" decoding="async">`;
+          container.appendChild(item);
+        });
+      }
+    }
+
+    function openLightbox(url) {
+      document.getElementById('lightbox-img').src = url;
+      document.getElementById('lightbox').classList.add('active');
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('active');
+    }
+
+    /* CONTACT TAB */
+    async function loadContactInfo() {
+      try {
+        const data = await apiRequest('/api/contact-info');
+        const container = document.getElementById('contact-info-list');
+        container.innerHTML = '';
+
+        data.forEach(info => {
+          let href = '#';
+          let iconSvg = '';
+
+          if (info.type === 'email') {
+            href = `mailto:${info.value}`;
+            iconSvg = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>`;
+          } else if (info.type === 'phone') {
+            href = `tel:${info.value}`;
+            iconSvg = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`;
+          } else if (info.type === 'address') {
+            href = `https://maps.google.com/?q=${encodeURIComponent(info.value)}`;
+            iconSvg = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
+          } else if (info.type === 'line') {
+            href = info.value.startsWith('http') ? info.value : `https://line.me/R/ti/p/~${info.value}`;
+            iconSvg = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.036 9.608.391.084.922.258 1.057.592.121.303.079.778.039 1.085l-.171 1.027c-.053.303-.242 1.186 1.039.647 1.281-.54 6.911-4.069 9.428-6.967 1.739-1.907 2.572-3.844 2.572-6.002z"/></svg>`;
+          }
+
+          if (info.type !== 'line_qr') {
+            const item = document.createElement('a');
+            item.className = 'contact-item';
+            item.href = href;
+            item.target = '_blank';
+            item.innerHTML = `
+              <div class="contact-icon">${iconSvg}</div>
+              <div>
+                <div style="font-size:0.75rem; color:var(--color-text-muted); text-transform:uppercase;">${info.type}</div>
+                <div style="font-weight:500;">${info.value}</div>
+              </div>
+            `;
+            container.appendChild(item);
+          }
+        });
+      } catch (err) {
+        console.error("Failed to load contact info", err);
+      }
+    }
+
+    async function handleContactSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('contact-submit-btn');
+      btn.disabled = true;
+      btn.textContent = '傳送中 (sending)...';
+
+      const payload = {
+        name: document.getElementById('contact-name').value,
+        email: document.getElementById('contact-email').value,
+        phone: document.getElementById('contact-phone').value,
+        description: document.getElementById('contact-desc').value
+      };
+
+      try {
+        const res = await apiRequest('/api/submit_form', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+
+        if (res.status === 'success') {
+          alert('您的需求已順利送出，我們將盡快與您聯繫！');
+          document.getElementById('contact-form').reset();
+        } else {
+          alert('送出失敗，請再試一次。');
+        }
+      } catch (err) {
+        alert('發生錯誤，請稍後再試。');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '送出訊息';
+      }
+    }
+
+    /* CANVAS BACKGROUND ALGORITHM: Deep Space Star Trails & Subtle Gold Rays */
+    function initCanvasBackground() {
+      const canvas = document.getElementById('bg-canvas');
+      const ctx = canvas.getContext('2d');
+
+      let width = (canvas.width = window.innerWidth);
+      let height = (canvas.height = window.innerHeight);
+
+      window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      });
+
+      // Pointer tracking
+      let mouse = { x: width / 2, y: height / 2 };
+      window.addEventListener('mousemove', (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+      });
+
+      // Star / Ray particles
+      const particleCount = 45;
+      const particles = [];
+      const colors = ["rgba(212,175,55,0.2)", "rgba(229,193,88,0.15)", "rgba(113,113,122,0.1)"];
+
+      for (let i = 0; i < particleCount; i++) {
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          radius: Math.random() * 2 + 0.5,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: (Math.random() - 0.5) * 0.3,
+          angle: Math.random() * Math.PI * 2
+        });
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+
+        // Draw Subtle Refractive Gold Rays from Mouse or Center
+        const gradient = ctx.createRadialGradient(mouse.x, mouse.y, 10, mouse.x, mouse.y, Math.max(width, height) * 0.6);
+        gradient.addColorStop(0, 'rgba(212,175,55,0.06)');
+        gradient.addColorStop(0.5, 'rgba(212,175,55,0.02)');
+        gradient.addColorStop(1, 'transparent');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+
+        // Render Particles and Gentle Connecting Rays
+        particles.forEach((p, index) => {
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.x < 0) p.x = width;
+          if (p.x > width) p.x = 0;
+          if (p.y < 0) p.y = height;
+          if (p.y > height) p.y = 0;
+
+          // Draw Star Node
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.fill();
+
+          // Inter-particle links
+          for (let j = index + 1; j < particles.length; j++) {
+            const p2 = particles[j];
+            const dx = p.x - p2.x;
+            const dy = p.y - p2.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < 120) {
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.strokeStyle = `rgba(212, 175, 55, ${0.08 * (1 - dist / 120)})`;
+              ctx.stroke();
+            }
+          }
+        });
+
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+    }
+  </script>
+</body>
+</html>
+```
