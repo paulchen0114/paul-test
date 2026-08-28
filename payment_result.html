@@ -3,24 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>醒香微醺 SoberBloom | 付款結果</title>
+  <title>付款結果 | 醒香微醺 SoberBloom</title>
   <style>
     :root {
       --color-primary: #D4AF37;
       --color-primary-hover: #B89628;
       --color-secondary: #71717A;
       --color-bg: #09090B;
-      --color-surface: rgba(24, 24, 27, 0.85);
+      --color-surface: #18181B;
       --color-surface-border: #27272A;
       --color-text-main: #F4F4F5;
       --color-text-muted: #A1A1AA;
       --color-accent: #E5C158;
-      --color-success: #10B981;
-      --color-error: #EF4444;
-      --radius-badge: 4px;
-      --radius-card: 16px;
+      --color-success: #22c55e;
+      --color-danger: #ef4444;
+      --radius-card: 12px;
       --radius-button: 8px;
-      --shadow-card: 0 20px 50px rgba(0,0,0,0.8), 0 0 1px 1px rgba(212,175,55,0.25);
+      --shadow-modal: 0 25px 60px rgba(0,0,0,0.85);
       --shadow-glow: 0 0 25px rgba(212,175,55,0.25);
       --font-family: 'Georgia', 'Palatino Linotype', 'Noto Serif TC', serif, sans-serif;
     }
@@ -39,12 +38,12 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 1.5rem;
+      padding: 20px;
       overflow-x: hidden;
       position: relative;
     }
 
-    #bg-canvas {
+    #bgCanvas {
       position: fixed;
       top: 0;
       left: 0;
@@ -54,137 +53,81 @@
       pointer-events: none;
     }
 
-    /* Container Card */
+    /* Result Card Layout */
     .result-card {
-      background: var(--color-surface);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: rgba(24, 24, 27, 0.85);
       border: 1px solid var(--color-surface-border);
+      backdrop-filter: blur(16px);
       border-radius: var(--radius-card);
-      box-shadow: var(--shadow-card);
       width: 100%;
       max-width: 480px;
-      padding: 3rem 2rem;
+      padding: 40px 32px;
+      box-shadow: var(--shadow-modal);
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       position: relative;
-      animation: cardAppear 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: fadeInScale 0.5s ease-out forwards;
     }
 
-    @keyframes cardAppear {
+    @keyframes fadeInScale {
       from {
         opacity: 0;
-        transform: translateY(20px) scale(0.96);
+        transform: scale(0.92) translateY(15px);
       }
       to {
         opacity: 1;
-        transform: translateY(0) scale(1);
+        transform: scale(1) translateY(0);
       }
     }
 
-    /* Header / Brand */
     .brand-header {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 2rem;
-    }
-
-    .brand-header svg {
-      width: 28px;
-      height: 28px;
-      fill: var(--color-primary);
+      margin-bottom: 24px;
     }
 
     .brand-title {
-      font-size: 1.25rem;
-      font-weight: 600;
+      font-size: 1.35rem;
+      font-weight: 700;
       letter-spacing: 0.15em;
       color: var(--color-primary);
-      text-transform: uppercase;
+      line-height: 1.2;
     }
 
     .brand-subtitle {
-      font-size: 0.7rem;
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
       color: var(--color-text-muted);
-      letter-spacing: 0.2em;
-      display: block;
-      margin-top: -2px;
+      text-transform: uppercase;
+      margin-top: 2px;
     }
 
-    /* Animated Status Icons */
+    /* Status Icon Animations */
     .icon-container {
-      width: 88px;
-      height: 88px;
-      margin: 0 auto 1.5rem auto;
-      position: relative;
+      width: 80px;
+      height: 80px;
+      margin: 10px 0 24px;
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
     }
 
-    .svg-icon {
+    .status-svg {
       width: 100%;
       height: 100%;
     }
 
-    /* Success Circle & Check Animation */
-    .success-circle {
-      stroke: var(--color-success);
-      stroke-width: 2;
-      stroke-dasharray: 260;
-      stroke-dashoffset: 260;
-      animation: strokeCircle 0.8s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+    .circle-bg {
+      stroke-dasharray: 283;
+      stroke-dashoffset: 283;
+      animation: strokeCircle 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards 0.2s;
     }
 
-    .success-check {
-      stroke: var(--color-success);
-      stroke-width: 3;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      stroke-dasharray: 50;
-      stroke-dashoffset: 50;
-      animation: strokeCheck 0.4s 0.6s ease-in-out forwards;
-    }
-
-    /* Error Circle & Cross Animation */
-    .error-circle {
-      stroke: var(--color-error);
-      stroke-width: 2;
-      stroke-dasharray: 260;
-      stroke-dashoffset: 260;
-      animation: strokeCircle 0.8s cubic-bezier(0.65, 0, 0.45, 1) forwards;
-    }
-
-    .error-cross-1, .error-cross-2 {
-      stroke: var(--color-error);
-      stroke-width: 3;
-      stroke-linecap: round;
-      stroke-dasharray: 40;
-      stroke-dashoffset: 40;
-    }
-
-    .error-cross-1 {
-      animation: strokeCheck 0.3s 0.5s ease-in-out forwards;
-    }
-
-    .error-cross-2 {
-      animation: strokeCheck 0.3s 0.7s ease-in-out forwards;
-    }
-
-    /* Warning Icon Animation */
-    .warning-circle {
-      stroke: var(--color-accent);
-      stroke-width: 2;
-      stroke-dasharray: 260;
-      stroke-dashoffset: 260;
-      animation: strokeCircle 0.8s cubic-bezier(0.65, 0, 0.45, 1) forwards;
-    }
-
-    .warning-mark {
-      fill: var(--color-accent);
-      opacity: 0;
-      animation: fadeInMark 0.4s 0.6s ease-in-out forwards;
+    .check-mark, .cross-mark {
+      stroke-dasharray: 100;
+      stroke-dashoffset: 100;
+      animation: strokeCheck 0.4s cubic-bezier(0.65, 0, 0.45, 1) forwards 0.7s;
     }
 
     @keyframes strokeCircle {
@@ -199,365 +142,278 @@
       }
     }
 
-    @keyframes fadeInMark {
-      to {
-        opacity: 1;
-      }
-    }
-
-    /* Content Typography */
-    .result-title {
-      font-size: 1.75rem;
-      font-weight: 600;
+    /* Status Text & Elements */
+    .status-title {
+      font-size: 1.8rem;
+      font-weight: 700;
       letter-spacing: 0.08em;
-      margin-bottom: 0.5rem;
+      margin-bottom: 8px;
     }
 
-    .result-title.success { color: var(--color-text-main); }
-    .result-title.error { color: var(--color-error); }
-    .result-title.warning { color: var(--color-accent); }
+    .status-title.success {
+      color: var(--color-primary);
+    }
 
-    .result-subtitle {
-      font-size: 0.95rem;
+    .status-title.danger {
+      color: var(--color-danger);
+    }
+
+    .status-title.warning {
+      color: var(--color-accent);
+    }
+
+    .status-subtitle {
       color: var(--color-text-muted);
+      font-size: 0.95rem;
       line-height: 1.6;
-      margin-bottom: 2rem;
+      margin-bottom: 24px;
     }
 
-    /* Order Badge Box */
-    .order-box {
-      background: var(--color-bg);
-      border: 1px dashed rgba(212, 175, 55, 0.3);
-      border-radius: var(--radius-button);
-      padding: 1rem 1.25rem;
-      margin-bottom: 1.5rem;
-      display: inline-flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
+    .order-badge {
+      background: rgba(212, 175, 55, 0.08);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      border-radius: 6px;
+      padding: 10px 16px;
+      font-size: 0.9rem;
+      color: var(--color-accent);
+      margin-bottom: 20px;
+      word-break: break-all;
       width: 100%;
     }
 
-    .order-label {
-      font-size: 0.75rem;
-      color: var(--color-text-muted);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    .order-number {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--color-primary);
-      letter-spacing: 0.08em;
-      font-family: monospace, serif;
-    }
-
-    /* Error Message Box */
     .message-box {
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      color: #F87171;
-      font-size: 0.88rem;
-      padding: 0.85rem 1rem;
-      border-radius: var(--radius-button);
-      margin-bottom: 2rem;
-      line-height: 1.5;
-      text-align: left;
-    }
-
-    .message-box-subtle {
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 3px solid var(--color-secondary);
+      padding: 12px 16px;
       font-size: 0.85rem;
       color: var(--color-text-muted);
-      margin-bottom: 2rem;
+      text-align: left;
+      border-radius: 4px;
+      margin-bottom: 28px;
+      width: 100%;
     }
 
-    /* Action Buttons */
-    .button-group {
+    .message-box.error {
+      border-left-color: var(--color-danger);
+      background: rgba(239, 68, 68, 0.08);
+      color: #fca5a5;
+    }
+
+    /* Buttons */
+    .btn-group {
       display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
+      gap: 12px;
+      width: 100%;
+      margin-top: 8px;
     }
 
-    .btn-primary {
-      background-color: var(--color-primary);
-      color: #000;
-      font-weight: 600;
-      padding: 0.8rem 1.75rem;
-      border-radius: var(--radius-button);
-      border: none;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      font-size: 0.95rem;
+    .btn {
+      flex: 1;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      flex: 1;
-      min-width: 140px;
+      padding: 14px 20px;
+      border-radius: var(--radius-button);
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid var(--color-primary);
+      background-color: var(--color-primary);
+      color: #000000;
+      text-decoration: none;
+      font-size: 0.95rem;
     }
 
-    .btn-primary:hover {
+    .btn:hover {
       background-color: var(--color-primary-hover);
+      border-color: var(--color-primary-hover);
       transform: translateY(-2px);
       box-shadow: var(--shadow-glow);
     }
 
-    .btn-outline {
-      background: transparent;
+    .btn-secondary {
+      background-color: transparent;
       color: var(--color-text-main);
-      border: 1px solid var(--color-surface-border);
-      padding: 0.8rem 1.75rem;
-      border-radius: var(--radius-button);
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      font-size: 0.95rem;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex: 1;
-      min-width: 140px;
+      border-color: var(--color-surface-border);
     }
 
-    .btn-outline:hover {
-      border-color: var(--color-primary);
-      color: var(--color-primary);
-      transform: translateY(-2px);
-      background: rgba(212, 175, 55, 0.05);
+    .btn-secondary:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-color: var(--color-secondary);
+      color: #ffffff;
     }
 
-    /* Responsive */
     @media (max-width: 480px) {
       .result-card {
-        padding: 2.25rem 1.5rem;
+        padding: 32px 20px;
       }
-      .result-title {
-        font-size: 1.5rem;
-      }
-      .button-group {
+      .btn-group {
         flex-direction: column;
-      }
-      .btn-primary, .btn-outline {
-        width: 100%;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- Background Canvas -->
-  <canvas id="bg-canvas"></canvas>
+  <!-- Background Dynamic Canvas -->
+  <canvas id="bgCanvas"></canvas>
 
-  <!-- Centered Result Card -->
-  <div class="result-card" id="result-card">
-    <!-- Brand Title (Hardcoded) -->
+  <div class="result-card">
     <div class="brand-header">
-      <svg viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
-      <div>
-        <span class="brand-title">醒香微醺</span>
-        <span class="brand-subtitle">SoberBloom</span>
-      </div>
+      <div class="brand-title">醒香微醺</div>
+      <div class="brand-subtitle">SoberBloom</div>
     </div>
 
-    <!-- Dynamic Content Target -->
-    <div id="status-content">
-      <!-- Injected via JavaScript based on URL Query Parameters -->
+    <div id="resultContent" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+      <!-- Dynamic Content Rendered Here -->
     </div>
   </div>
 
   <script>
-    /* Query String Parser */
-    function getQueryParams() {
-      const params = new URLSearchParams(window.location.search);
-      return {
-        merchantOrderNo: params.get('MerchantOrderNo') || '',
-        status: params.get('Status') || '',
-        message: params.get('Message') || ''
-      };
-    }
+    /* Dynamic Star Trails Background Algorithm */
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
 
-    /* Render Page State */
-    function renderState() {
-      const { merchantOrderNo, status, message } = getQueryParams();
-      const container = document.getElementById('status-content');
+    let mouse = { x: width / 2, y: height / 2 };
+    const particles = [];
+    const colors = ["rgba(212,175,55,0.25)", "rgba(229,193,88,0.18)", "rgba(113,113,122,0.12)"];
 
-      if (!status && !merchantOrderNo) {
-        // STATE 3: No URL parameters
-        container.innerHTML = `
-          <div class="icon-container">
-            <svg class="svg-icon" viewBox="0 0 100 100">
-              <circle class="warning-circle" cx="50" cy="50" r="40" fill="none"/>
-              <path class="warning-mark" d="M50 30 v25 M50 68 v5" stroke="var(--color-accent)" stroke-width="4" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <h1 class="result-title warning">查無訂單資訊</h1>
-          <p class="result-subtitle">無法取得當前交易紀錄，請確認您的連結是否正確。</p>
-          <div class="button-group">
-            <a href="index.html" class="btn-primary">返回首頁</a>
-          </div>
-        `;
-      } else if (status.toUpperCase() === 'SUCCESS') {
-        // STATE 1: Payment Success
-        container.innerHTML = `
-          <div class="icon-container">
-            <svg class="svg-icon" viewBox="0 0 100 100">
-              <circle class="success-circle" cx="50" cy="50" r="40" fill="none"/>
-              <polyline class="success-check" points="30,52 44,65 70,38" fill="none"/>
-            </svg>
-          </div>
-          <h1 class="result-title success">付款成功！</h1>
-          <p class="result-subtitle">感謝您的訂購，我們已收到您的付款，專人將盡快為您安排出貨。</p>
-          
-          ${merchantOrderNo ? `
-            <div class="order-box">
-              <span class="order-label">訂單編號 Order ID</span>
-              <span class="order-number">${merchantOrderNo}</span>
-            </div>
-          ` : ''}
-
-          ${message ? `<p class="message-box-subtle">交易訊息：${escapeHtml(message)}</p>` : ''}
-
-          <div class="button-group">
-            <a href="index.html" class="btn-primary">返回首頁</a>
-          </div>
-        `;
-      } else {
-        // STATE 2: Payment Failed
-        container.innerHTML = `
-          <div class="icon-container">
-            <svg class="svg-icon" viewBox="0 0 100 100">
-              <circle class="error-circle" cx="50" cy="50" r="40" fill="none"/>
-              <line class="error-cross-1" x1="35" y1="35" x2="65" y2="65" fill="none"/>
-              <line class="error-cross-2" x1="65" y1="35" x2="35" y2="65" fill="none"/>
-            </svg>
-          </div>
-          <h1 class="result-title error">付款未完成</h1>
-          <p class="result-subtitle">很抱歉，此次交易未能完成，請稍後再試或選擇其他付款方式。</p>
-
-          ${merchantOrderNo ? `
-            <div class="order-box">
-              <span class="order-label">訂單編號 Order ID</span>
-              <span class="order-number">${merchantOrderNo}</span>
-            </div>
-          ` : ''}
-
-          ${message ? `
-            <div class="message-box">
-              <strong>失敗原因：</strong>${escapeHtml(message)}
-            </div>
-          ` : ''}
-
-          <div class="button-group">
-            <button onclick="retryCheckout()" class="btn-primary">重新結帳</button>
-            <a href="index.html" class="btn-outline">返回首頁</a>
-          </div>
-        `;
+    class StarParticle {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.radius = Math.random() * 1.5 + 0.5;
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+        this.vx = (Math.random() - 0.5) * 0.3;
+        this.vy = (Math.random() - 0.5) * 0.3;
+        this.alpha = Math.random();
+        this.alphaSpeed = 0.005 + Math.random() * 0.005;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.alpha += this.alphaSpeed;
+        if (this.alpha > 1 || this.alpha < 0.1) this.alphaSpeed = -this.alphaSpeed;
+        if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) this.reset();
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = '#D4AF37';
+        ctx.fill();
+        ctx.shadowBlur = 0;
       }
     }
 
-    function retryCheckout() {
-      if (window.history.length > 1) {
-        window.history.back();
-      } else {
-        window.location.href = 'index.html';
-      }
+    for (let i = 0; i < 40; i++) particles.push(new StarParticle());
+
+    function animateCanvas() {
+      ctx.clearRect(0, 0, width, height);
+      const grad = ctx.createRadialGradient(mouse.x, mouse.y, 10, width/2, height/2, width*0.8);
+      grad.addColorStop(0, 'rgba(212, 175, 55, 0.04)');
+      grad.addColorStop(1, 'rgba(9, 9, 11, 0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, width, height);
+      particles.forEach(p => { p.update(); p.draw(); });
+      requestAnimationFrame(animateCanvas);
     }
 
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
-
-    /* CANVAS BACKGROUND ALGORITHM: Deep Space Star Trails & Subtle Gold Rays */
-    function initCanvasBackground() {
-      const canvas = document.getElementById('bg-canvas');
-      const ctx = canvas.getContext('2d');
-
-      let width = (canvas.width = window.innerWidth);
-      let height = (canvas.height = window.innerHeight);
-
-      window.addEventListener('resize', () => {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
-      });
-
-      let mouse = { x: width / 2, y: height / 2 };
-      window.addEventListener('mousemove', (e) => {
-        mouse.x = e.clientX;
-        mouse.y = e.clientY;
-      });
-
-      const particleCount = 40;
-      const particles = [];
-      const colors = ["rgba(212,175,55,0.2)", "rgba(229,193,88,0.15)", "rgba(113,113,122,0.1)"];
-
-      for (let i = 0; i < particleCount; i++) {
-        particles.push({
-          x: Math.random() * width,
-          y: Math.random() * height,
-          radius: Math.random() * 2 + 0.5,
-          color: colors[Math.floor(Math.random() * colors.length)],
-          vx: (Math.random() - 0.5) * 0.25,
-          vy: (Math.random() - 0.5) * 0.25
-        });
-      }
-
-      function animate() {
-        ctx.clearRect(0, 0, width, height);
-
-        // Radial Golden Refraction Beam
-        const gradient = ctx.createRadialGradient(mouse.x, mouse.y, 10, mouse.x, mouse.y, Math.max(width, height) * 0.65);
-        gradient.addColorStop(0, 'rgba(212,175,55,0.06)');
-        gradient.addColorStop(0.5, 'rgba(212,175,55,0.02)');
-        gradient.addColorStop(1, 'transparent');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, width, height);
-
-        // Render Star Particles
-        particles.forEach((p, index) => {
-          p.x += p.vx;
-          p.y += p.vy;
-
-          if (p.x < 0) p.x = width;
-          if (p.x > width) p.x = 0;
-          if (p.y < 0) p.y = height;
-          if (p.y > height) p.y = 0;
-
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-          ctx.fillStyle = p.color;
-          ctx.fill();
-
-          for (let j = index + 1; j < particles.length; j++) {
-            const p2 = particles[j];
-            const dx = p.x - p2.x;
-            const dy = p.y - p2.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-
-            if (dist < 110) {
-              ctx.beginPath();
-              ctx.moveTo(p.x, p.y);
-              ctx.lineTo(p2.x, p2.y);
-              ctx.strokeStyle = `rgba(212, 175, 55, ${0.08 * (1 - dist / 110)})`;
-              ctx.stroke();
-            }
-          }
-        });
-
-        requestAnimationFrame(animate);
-      }
-
-      animate();
-    }
-
-    // Initialize Page
-    document.addEventListener('DOMContentLoaded', () => {
-      initCanvasBackground();
-      renderState();
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
     });
+
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    animateCanvas();
+
+    /* URL Query Parameter Logic & Rendering */
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const merchantOrderNo = urlParams.get('MerchantOrderNo');
+      const status = urlParams.get('Status');
+      const message = urlParams.get('Message');
+
+      const container = document.getElementById('resultContent');
+
+      // State 1: No Parameters
+      if (!status && !merchantOrderNo) {
+        container.innerHTML = `
+          <div class="icon-container">
+            <svg class="status-svg" viewBox="0 0 100 100">
+              <circle class="circle-bg" cx="50" cy="50" r="45" fill="none" stroke="var(--color-accent)" stroke-width="4"/>
+              <text x="50" y="62" font-size="36" text-anchor="middle" fill="var(--color-accent)">?</text>
+            </svg>
+          </div>
+          <h1 class="status-title warning">查無訂單資訊</h1>
+          <p class="status-subtitle">未偵測到此筆交易之相關資料，請確認連結是否正確。</p>
+          <div class="btn-group">
+            <a href="index.html" class="btn">返回首頁</a>
+          </div>
+        `;
+        return;
+      }
+
+      // State 2: Payment Success
+      if (status === 'SUCCESS') {
+        const messageHtml = message ? `<div class="message-box"><strong>金流訊息：</strong> ${escapeHtml(message)}</div>` : '';
+        const orderHtml = merchantOrderNo ? `<div class="order-badge">訂單編號：${escapeHtml(merchantOrderNo)}</div>` : '';
+
+        container.innerHTML = `
+          <div class="icon-container">
+            <svg class="status-svg" viewBox="0 0 100 100">
+              <circle class="circle-bg" cx="50" cy="50" r="45" fill="none" stroke="var(--color-primary)" stroke-width="4"/>
+              <path class="check-mark" fill="none" stroke="var(--color-primary)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" d="M28 52 L43 67 L72 35" />
+            </svg>
+          </div>
+          <h1 class="status-title success">付款成功！</h1>
+          <p class="status-subtitle">感謝您的訂購，我們已收到您的付款，專屬調飲組合將盡快為您準備與出貨。</p>
+          ${orderHtml}
+          ${messageHtml}
+          <div class="btn-group">
+            <a href="index.html" class="btn">返回首頁</a>
+          </div>
+        `;
+      } 
+      // State 3: Payment Failed
+      else {
+        const messageHtml = message ? `<div class="message-box error"><strong>失敗原因：</strong> ${escapeHtml(message)}</div>` : '';
+        const orderHtml = merchantOrderNo ? `<div class="order-badge">訂單編號：${escapeHtml(merchantOrderNo)}</div>` : '';
+
+        container.innerHTML = `
+          <div class="icon-container">
+            <svg class="status-svg" viewBox="0 0 100 100">
+              <circle class="circle-bg" cx="50" cy="50" r="45" fill="none" stroke="var(--color-danger)" stroke-width="4"/>
+              <path class="cross-mark" fill="none" stroke="var(--color-danger)" stroke-width="5" stroke-linecap="round" d="M35 35 L65 65 M65 35 L35 65" />
+            </svg>
+          </div>
+          <h1 class="status-title danger">付款未完成</h1>
+          <p class="status-subtitle">很抱歉，此次交易未能完成，請稍後再試或選擇其他付款方式。</p>
+          ${orderHtml}
+          ${messageHtml}
+          <div class="btn-group">
+            <button onclick="history.back()" class="btn btn-secondary">重新結帳</button>
+            <a href="index.html" class="btn">返回首頁</a>
+          </div>
+        `;
+      }
+    });
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
   </script>
 </body>
 </html>
