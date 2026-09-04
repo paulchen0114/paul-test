@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>付款結果 | 醒香微醺 SoberBloom</title>
+  <title>交易結果 | 醒香微醺 SoberBloom</title>
   <style>
     :root {
       --color-primary: #D4AF37;
@@ -15,13 +15,13 @@
       --color-text-main: #F4F4F5;
       --color-text-muted: #A1A1AA;
       --color-accent: #E5C158;
-      --color-success: #22c55e;
-      --color-danger: #ef4444;
+      --radius-badge: 4px;
       --radius-card: 12px;
       --radius-button: 8px;
-      --shadow-modal: 0 25px 60px rgba(0,0,0,0.85);
+      --radius-input: 6px;
+      --shadow-card: 0 12px 40px rgba(0,0,0,0.8), 0 0 1px 1px rgba(212,175,55,0.25);
       --shadow-glow: 0 0 25px rgba(212,175,55,0.25);
-      --font-family: 'Georgia', 'Palatino Linotype', 'Noto Serif TC', serif, sans-serif;
+      --font-family: 'Georgia', 'Palatino Linotype', 'Times New Roman', serif, sans-serif;
     }
 
     * {
@@ -38,12 +38,12 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
-      overflow-x: hidden;
+      padding: 1.5rem;
       position: relative;
+      overflow-x: hidden;
     }
 
-    #bgCanvas {
+    canvas#bg-canvas {
       position: fixed;
       top: 0;
       left: 0;
@@ -53,366 +53,465 @@
       pointer-events: none;
     }
 
-    /* Result Card Layout */
+    /* Result Card */
     .result-card {
       background: rgba(24, 24, 27, 0.85);
-      border: 1px solid var(--color-surface-border);
       backdrop-filter: blur(16px);
+      border: 1px solid rgba(212, 175, 55, 0.25);
       border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card);
       width: 100%;
       max-width: 480px;
-      padding: 40px 32px;
-      box-shadow: var(--shadow-modal);
+      padding: 2.5rem 2rem;
       text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
       position: relative;
-      animation: fadeInScale 0.5s ease-out forwards;
+      animation: cardAppear 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    @keyframes fadeInScale {
-      from {
-        opacity: 0;
-        transform: scale(0.92) translateY(15px);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
+    @keyframes cardAppear {
+      0% { opacity: 0; transform: translateY(20px) scale(0.96); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    .brand-header {
-      margin-bottom: 24px;
+    /* Brand Header */
+    .brand-logo {
+      margin-bottom: 1.75rem;
+      display: inline-block;
+      text-decoration: none;
     }
 
-    .brand-title {
-      font-size: 1.35rem;
+    .brand-logo-text {
+      font-size: 1.4rem;
       font-weight: 700;
-      letter-spacing: 0.15em;
-      color: var(--color-primary);
-      line-height: 1.2;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #FFF 0%, #D4AF37 50%, #E5C158 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: block;
     }
 
-    .brand-subtitle {
-      font-size: 0.65rem;
-      letter-spacing: 0.25em;
-      color: var(--color-text-muted);
+    .brand-logo-sub {
+      font-size: 0.7rem;
+      color: var(--color-secondary);
+      letter-spacing: 3px;
       text-transform: uppercase;
+      display: block;
       margin-top: 2px;
     }
 
-    /* Status Icon Animations */
-    .icon-container {
+    /* Status Icons & Animations */
+    .icon-wrapper {
       width: 80px;
       height: 80px;
-      margin: 10px 0 24px;
+      margin: 0 auto 1.5rem;
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
     }
 
-    .status-svg {
-      width: 100%;
-      height: 100%;
+    /* Animated Success Checkmark */
+    .svg-success {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: block;
+      stroke-width: 3;
+      stroke: #4ade80;
+      stroke-miterlimit: 10;
+      box-shadow: inset 0px 0px 0px #4ade80;
+      animation: fillSuccess 0.4s ease-in-out 0.4s forwards, scale 0.3s ease-in-out 0.9s both;
     }
 
-    .circle-bg {
-      stroke-dasharray: 283;
-      stroke-dashoffset: 283;
-      animation: strokeCircle 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards 0.2s;
+    .svg-success .circle {
+      stroke-dasharray: 166;
+      stroke-dashoffset: 166;
+      stroke-width: 3;
+      stroke-miterlimit: 10;
+      stroke: #4ade80;
+      fill: none;
+      animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
     }
 
-    .check-mark, .cross-mark {
-      stroke-dasharray: 100;
-      stroke-dashoffset: 100;
-      animation: strokeCheck 0.4s cubic-bezier(0.65, 0, 0.45, 1) forwards 0.7s;
+    .svg-success .check {
+      transform-origin: 50% 50%;
+      stroke-dasharray: 48;
+      stroke-dashoffset: 48;
+      animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
     }
 
-    @keyframes strokeCircle {
-      to {
-        stroke-dashoffset: 0;
-      }
+    /* Animated Error Icon */
+    .svg-error {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: block;
+      stroke-width: 3;
+      stroke: #f87171;
+      stroke-miterlimit: 10;
+      animation: fillError 0.4s ease-in-out 0.4s forwards, scale 0.3s ease-in-out 0.9s both;
     }
 
-    @keyframes strokeCheck {
-      to {
-        stroke-dashoffset: 0;
-      }
+    .svg-error .circle {
+      stroke-dasharray: 166;
+      stroke-dashoffset: 166;
+      stroke-width: 3;
+      stroke-miterlimit: 10;
+      stroke: #f87171;
+      fill: none;
+      animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
     }
 
-    /* Status Text & Elements */
-    .status-title {
-      font-size: 1.8rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      margin-bottom: 8px;
+    .svg-error .line {
+      stroke-dasharray: 30;
+      stroke-dashoffset: 30;
+      animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
     }
 
-    .status-title.success {
-      color: var(--color-primary);
-    }
-
-    .status-title.danger {
-      color: var(--color-danger);
-    }
-
-    .status-title.warning {
+    /* Info Icon */
+    .svg-info {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(113, 113, 122, 0.15);
+      border: 1px solid var(--color-surface-border);
       color: var(--color-accent);
     }
 
-    .status-subtitle {
+    @keyframes stroke { 100% { stroke-dashoffset: 0; } }
+    @keyframes scale { 0%, 100% { transform: none; } 50% { transform: scale3d(1.1, 1.1, 1); } }
+    @keyframes fillSuccess { 100% { box-shadow: inset 0px 0px 0px 40px rgba(34, 197, 94, 0.15); } }
+    @keyframes fillError { 100% { box-shadow: inset 0px 0px 0px 40px rgba(239, 68, 68, 0.15); } }
+
+    /* Typography */
+    .result-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--color-text-main);
+      margin-bottom: 0.5rem;
+      letter-spacing: 1px;
+    }
+
+    .result-title.success { color: #4ade80; }
+    .result-title.error { color: #f87171; }
+    .result-title.info { color: var(--color-accent); }
+
+    .result-desc {
       color: var(--color-text-muted);
       font-size: 0.95rem;
       line-height: 1.6;
-      margin-bottom: 24px;
+      margin-bottom: 1.5rem;
     }
 
-    .order-badge {
-      background: rgba(212, 175, 55, 0.08);
-      border: 1px solid rgba(212, 175, 55, 0.25);
-      border-radius: 6px;
-      padding: 10px 16px;
-      font-size: 0.9rem;
-      color: var(--color-accent);
-      margin-bottom: 20px;
-      word-break: break-all;
-      width: 100%;
-    }
-
-    .message-box {
-      background: rgba(255, 255, 255, 0.03);
-      border-left: 3px solid var(--color-secondary);
-      padding: 12px 16px;
-      font-size: 0.85rem;
-      color: var(--color-text-muted);
+    /* Order Badge Box */
+    .order-badge-box {
+      background: rgba(9, 9, 11, 0.7);
+      border: 1px solid var(--color-surface-border);
+      border-radius: var(--radius-input);
+      padding: 1rem;
+      margin-bottom: 1.5rem;
       text-align: left;
-      border-radius: 4px;
-      margin-bottom: 28px;
-      width: 100%;
     }
 
-    .message-box.error {
-      border-left-color: var(--color-danger);
-      background: rgba(239, 68, 68, 0.08);
+    .order-badge-label {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .order-badge-value {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 1.1rem;
+      color: var(--color-primary);
+      font-weight: bold;
+      letter-spacing: 1px;
+      word-break: break-all;
+    }
+
+    /* Message Alert Box */
+    .alert-box {
+      padding: 0.85rem 1rem;
+      border-radius: var(--radius-input);
+      font-size: 0.85rem;
+      margin-bottom: 1.5rem;
+      text-align: left;
+      line-height: 1.5;
+    }
+
+    .alert-box.muted {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--color-surface-border);
+      color: var(--color-text-muted);
+    }
+
+    .alert-box.error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
       color: #fca5a5;
     }
 
     /* Buttons */
     .btn-group {
       display: flex;
-      gap: 12px;
-      width: 100%;
-      margin-top: 8px;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 0.5rem;
     }
 
     .btn {
-      flex: 1;
+      padding: 12px 24px;
+      border-radius: var(--radius-button);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 14px 20px;
-      border-radius: var(--radius-button);
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      border: 1px solid var(--color-primary);
-      background-color: var(--color-primary);
-      color: #000000;
-      text-decoration: none;
-      font-size: 0.95rem;
+      gap: 8px;
+      border: none;
+      flex: 1;
     }
 
-    .btn:hover {
-      background-color: var(--color-primary-hover);
-      border-color: var(--color-primary-hover);
+    .btn-primary {
+      background: linear-gradient(135deg, #D4AF37 0%, #B89628 100%);
+      color: #000;
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+    }
+
+    .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: var(--shadow-glow);
+      box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
+      background: linear-gradient(135deg, #E5C158 0%, #D4AF37 100%);
     }
 
     .btn-secondary {
-      background-color: transparent;
+      background: transparent;
+      border: 1px solid var(--color-surface-border);
       color: var(--color-text-main);
-      border-color: var(--color-surface-border);
     }
 
     .btn-secondary:hover {
-      background-color: rgba(255, 255, 255, 0.05);
-      border-color: var(--color-secondary);
-      color: #ffffff;
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      transform: translateY(-2px);
     }
 
     @media (max-width: 480px) {
-      .result-card {
-        padding: 32px 20px;
-      }
-      .btn-group {
-        flex-direction: column;
-      }
+      .result-card { padding: 2rem 1.25rem; }
+      .btn-group { flex-direction: column; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Background Dynamic Canvas -->
-  <canvas id="bgCanvas"></canvas>
+  <!-- Background Canvas -->
+  <canvas id="bg-canvas"></canvas>
 
+  <!-- Centered Result Card -->
   <div class="result-card">
-    <div class="brand-header">
-      <div class="brand-title">醒香微醺</div>
-      <div class="brand-subtitle">SoberBloom</div>
+    <div class="brand-logo">
+      <span class="brand-logo-text">醒香微醺</span>
+      <span class="brand-logo-sub">SOBERBLOOM</span>
     </div>
 
-    <div id="resultContent" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-      <!-- Dynamic Content Rendered Here -->
+    <div id="result-content">
+      <!-- Dynamic Content Rendered via JS -->
     </div>
   </div>
 
   <script>
-    /* Dynamic Star Trails Background Algorithm */
-    const canvas = document.getElementById('bgCanvas');
-    const ctx = canvas.getContext('2d');
-    let width = canvas.width = window.innerWidth;
-    let height = canvas.height = window.innerHeight;
+    // --- CANVAS BACKGROUND ANIMATION ---
+    (function initCanvas() {
+      const canvas = document.getElementById('bg-canvas');
+      const ctx = canvas.getContext('2d');
+      let width, height;
+      let particles = [];
+      let mouse = { x: null, y: null };
 
-    let mouse = { x: width / 2, y: height / 2 };
-    const particles = [];
-    const colors = ["rgba(212,175,55,0.25)", "rgba(229,193,88,0.18)", "rgba(113,113,122,0.12)"];
-
-    class StarParticle {
-      constructor() {
-        this.reset();
+      function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
       }
-      reset() {
-        this.x = Math.random() * width;
-        this.y = Math.random() * height;
-        this.radius = Math.random() * 1.5 + 0.5;
-        this.color = colors[Math.floor(Math.random() * colors.length)];
-        this.vx = (Math.random() - 0.5) * 0.3;
-        this.vy = (Math.random() - 0.5) * 0.3;
-        this.alpha = Math.random();
-        this.alphaSpeed = 0.005 + Math.random() * 0.005;
+
+      window.addEventListener('resize', resize);
+      resize();
+
+      window.addEventListener('mousemove', (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+      });
+
+      const colors = ["rgba(212,175,55,0.25)", "rgba(229,193,88,0.18)", "rgba(113,113,122,0.15)"];
+
+      for (let i = 0; i < 35; i++) {
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          radius: Math.random() * 2 + 1,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          angle: Math.random() * Math.PI * 2,
+          speed: Math.random() * 0.3 + 0.1
+        });
       }
-      update() {
-        this.x += this.vx;
-        this.y += this.vy;
-        this.alpha += this.alphaSpeed;
-        if (this.alpha > 1 || this.alpha < 0.1) this.alphaSpeed = -this.alphaSpeed;
-        if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) this.reset();
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+
+        const gradient = ctx.createRadialGradient(
+          mouse.x || width / 2, mouse.y || height / 2, 10,
+          mouse.x || width / 2, mouse.y || height / 2, Math.max(width, height) * 0.6
+        );
+        gradient.addColorStop(0, 'rgba(212, 175, 55, 0.06)');
+        gradient.addColorStop(1, 'rgba(9, 9, 11, 0)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+
+        particles.forEach(p => {
+          p.angle += p.speed * 0.01;
+          p.x += Math.cos(p.angle) * p.speed;
+          p.y += Math.sin(p.angle) * p.speed;
+
+          if (p.x < 0) p.x = width;
+          if (p.x > width) p.x = 0;
+          if (p.y < 0) p.y = height;
+          if (p.y > height) p.y = 0;
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.fill();
+
+          if (mouse.x && mouse.y) {
+            const dx = mouse.x - p.x;
+            const dy = mouse.y - p.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 140) {
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(mouse.x, mouse.y);
+              ctx.strokeStyle = `rgba(212, 175, 55, ${0.12 * (1 - dist / 140)})`;
+              ctx.stroke();
+            }
+          }
+        });
+
+        requestAnimationFrame(animate);
       }
-      draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
-        ctx.shadowBlur = 8;
-        ctx.shadowColor = '#D4AF37';
-        ctx.fill();
-        ctx.shadowBlur = 0;
-      }
-    }
+      animate();
+    })();
 
-    for (let i = 0; i < 40; i++) particles.push(new StarParticle());
-
-    function animateCanvas() {
-      ctx.clearRect(0, 0, width, height);
-      const grad = ctx.createRadialGradient(mouse.x, mouse.y, 10, width/2, height/2, width*0.8);
-      grad.addColorStop(0, 'rgba(212, 175, 55, 0.04)');
-      grad.addColorStop(1, 'rgba(9, 9, 11, 0)');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, width, height);
-      particles.forEach(p => { p.update(); p.draw(); });
-      requestAnimationFrame(animateCanvas);
-    }
-
-    window.addEventListener('resize', () => {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-    });
-
-    window.addEventListener('mousemove', (e) => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-    });
-
-    animateCanvas();
-
-    /* URL Query Parameter Logic & Rendering */
-    document.addEventListener('DOMContentLoaded', () => {
+    // --- PARSE URL PARAMS & RENDER RESULT ---
+    (function renderPaymentResult() {
       const urlParams = new URLSearchParams(window.location.search);
-      const merchantOrderNo = urlParams.get('MerchantOrderNo');
-      const status = urlParams.get('Status');
-      const message = urlParams.get('Message');
+      const merchantOrderNo = urlParams.get('MerchantOrderNo') || urlParams.get('merchantOrderNo') || urlParams.get('orderNo');
+      const status = urlParams.get('Status') || urlParams.get('status');
+      const message = urlParams.get('Message') || urlParams.get('message');
 
-      const container = document.getElementById('resultContent');
+      const container = document.getElementById('result-content');
 
-      // State 1: No Parameters
-      if (!status && !merchantOrderNo) {
+      // STATE 1: NO PARAMS AT ALL
+      if (!merchantOrderNo && !status) {
         container.innerHTML = `
-          <div class="icon-container">
-            <svg class="status-svg" viewBox="0 0 100 100">
-              <circle class="circle-bg" cx="50" cy="50" r="45" fill="none" stroke="var(--color-accent)" stroke-width="4"/>
-              <text x="50" y="62" font-size="36" text-anchor="middle" fill="var(--color-accent)">?</text>
-            </svg>
+          <div class="icon-wrapper">
+            <div class="svg-info">
+              <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            </div>
           </div>
-          <h1 class="status-title warning">查無訂單資訊</h1>
-          <p class="status-subtitle">未偵測到此筆交易之相關資料，請確認連結是否正確。</p>
+          <h1 class="result-title info">查無訂單資訊</h1>
+          <p class="result-desc">無法讀取當前交易狀態，請確認您是否直接開啟了此頁面。</p>
           <div class="btn-group">
-            <a href="index.html" class="btn">返回首頁</a>
+            <a href="/" class="btn btn-primary">返回品牌首頁</a>
           </div>
         `;
         return;
       }
 
-      // State 2: Payment Success
-      if (status === 'SUCCESS') {
-        const messageHtml = message ? `<div class="message-box"><strong>金流訊息：</strong> ${escapeHtml(message)}</div>` : '';
-        const orderHtml = merchantOrderNo ? `<div class="order-badge">訂單編號：${escapeHtml(merchantOrderNo)}</div>` : '';
-
+      // STATE 2: SUCCESS
+      if (status === 'SUCCESS' || status === '1') {
         container.innerHTML = `
-          <div class="icon-container">
-            <svg class="status-svg" viewBox="0 0 100 100">
-              <circle class="circle-bg" cx="50" cy="50" r="45" fill="none" stroke="var(--color-primary)" stroke-width="4"/>
-              <path class="check-mark" fill="none" stroke="var(--color-primary)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" d="M28 52 L43 67 L72 35" />
+          <div class="icon-wrapper">
+            <svg class="svg-success" viewBox="0 0 52 52">
+              <circle class="circle" cx="26" cy="26" r="23"/>
+              <path class="check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
             </svg>
           </div>
-          <h1 class="status-title success">付款成功！</h1>
-          <p class="status-subtitle">感謝您的訂購，我們已收到您的付款，專屬調飲組合將盡快為您準備與出貨。</p>
-          ${orderHtml}
-          ${messageHtml}
-          <div class="btn-group">
-            <a href="index.html" class="btn">返回首頁</a>
-          </div>
-        `;
-      } 
-      // State 3: Payment Failed
-      else {
-        const messageHtml = message ? `<div class="message-box error"><strong>失敗原因：</strong> ${escapeHtml(message)}</div>` : '';
-        const orderHtml = merchantOrderNo ? `<div class="order-badge">訂單編號：${escapeHtml(merchantOrderNo)}</div>` : '';
+          <h1 class="result-title success">付款成功！</h1>
+          <p class="result-desc">感謝您的訂購，我們已收到您的款項，將儘快為您安排尊榮備貨與出貨。</p>
 
-        container.innerHTML = `
-          <div class="icon-container">
-            <svg class="status-svg" viewBox="0 0 100 100">
-              <circle class="circle-bg" cx="50" cy="50" r="45" fill="none" stroke="var(--color-danger)" stroke-width="4"/>
-              <path class="cross-mark" fill="none" stroke="var(--color-danger)" stroke-width="5" stroke-linecap="round" d="M35 35 L65 65 M65 35 L35 65" />
-            </svg>
-          </div>
-          <h1 class="status-title danger">付款未完成</h1>
-          <p class="status-subtitle">很抱歉，此次交易未能完成，請稍後再試或選擇其他付款方式。</p>
-          ${orderHtml}
-          ${messageHtml}
+          ${merchantOrderNo ? `
+            <div class="order-badge-box">
+              <div class="order-badge-label">交易訂單編號</div>
+              <div class="order-badge-value">${escapeHtml(merchantOrderNo)}</div>
+            </div>
+          ` : ''}
+
+          ${message ? `
+            <div class="alert-box muted">
+              <strong style="color: var(--color-primary);">金流說明：</strong> ${escapeHtml(message)}
+            </div>
+          ` : ''}
+
           <div class="btn-group">
-            <button onclick="history.back()" class="btn btn-secondary">重新結帳</button>
-            <a href="index.html" class="btn">返回首頁</a>
+            <a href="/" class="btn btn-primary">返回品牌首頁</a>
           </div>
         `;
+        return;
       }
-    });
+
+      // STATE 3: FAILURE / UNPAID
+      container.innerHTML = `
+        <div class="icon-wrapper">
+          <svg class="svg-error" viewBox="0 0 52 52">
+            <circle class="circle" cx="26" cy="26" r="23"/>
+            <path class="line" fill="none" d="M16 16l20 20M36 16L16 36"/>
+          </svg>
+        </div>
+        <h1 class="result-title error">付款未完成</h1>
+        <p class="result-desc">很抱歉，此次交易未能完成。請確認您的信用卡或扣款資訊後再試一次。</p>
+
+        ${merchantOrderNo ? `
+          <div class="order-badge-box">
+            <div class="order-badge-label">交易訂單編號</div>
+            <div class="order-badge-value" style="color: var(--color-text-muted);">${escapeHtml(merchantOrderNo)}</div>
+          </div>
+        ` : ''}
+
+        ${message ? `
+          <div class="alert-box error">
+            <strong>失敗原因：</strong> ${escapeHtml(message)}
+          </div>
+        ` : ''}
+
+        <div class="btn-group">
+          <button class="btn btn-secondary" onclick="goBackOrHome()">重新結帳</button>
+          <a href="/" class="btn btn-primary">返回首頁</a>
+        </div>
+      `;
+    })();
+
+    function goBackOrHome() {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = '/';
+      }
+    }
 
     function escapeHtml(str) {
       if (!str) return '';
-      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
     }
   </script>
 </body>
